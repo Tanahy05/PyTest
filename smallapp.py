@@ -1,6 +1,6 @@
 def add(x,y):
     """Add two numbers."""
-    return x + y+1
+    return x + y
 def subtract(x,y):
     """Subtract two numbers."""
     return x - y
