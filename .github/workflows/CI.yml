@@ -1,0 +1,44 @@
+name: PyTest
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test_app:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: set up python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.12"
+
+      - name: install dependancies
+        run: |
+          pip install -r rquirements.txt
+
+      - name: run tests
+        run: |
+          pytest
+
+  build_and_push:
+    needs: test_app
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DH_TOKEN }}" | docker login -u "${{ secrets.DH_USER }}" --password-stdin
+
+      - name: Build and push image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: ${{ secrets.DH_USER }}/calc-demo:latest

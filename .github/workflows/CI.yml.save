@@ -1,0 +1,40 @@
+name: PyTest
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test_app:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: set up python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.12"
+
+      - name: install dependancies
+
+        run: |
+          pip install -r requirements.txt
+
+      - name: run tests
+        run: |
+          pytest
+  build_push_image:
+    needs: test_app
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: login to docker
+        run: echo "${{secrets.DH_TOKEN}}" | docker login -u "${{secrets.DH_USER}}" --pasword-stdin
+      - name: build and push image
+        uses: docker
